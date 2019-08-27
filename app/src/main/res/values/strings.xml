@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Coins</string>
+    <string name="coin_main_welcome_tv">点击导入图片</string>
+    <string name="coin_dialog_album">从相册导入图片</string>
+    <string name="coin_dialog_camera">从相机拍摄照片</string>
+    <string name="coin_dialog_processing_bt">开始识别</string>
 </resources>
