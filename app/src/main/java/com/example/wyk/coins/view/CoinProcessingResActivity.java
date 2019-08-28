@@ -10,8 +10,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,8 +26,20 @@ import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.wyk.coins.R;
+import com.example.wyk.coins.presenter.CoinHoughCirclePresenter;
 import com.example.wyk.coins.presenter.GetPhotoPresenter;
 import com.example.wyk.coins.util.FileUtil;
+
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,10 +53,46 @@ public class CoinProcessingResActivity extends AppCompatActivity {
     Button setupBt;
 
     GetPhotoPresenter getPhotoPresenter;
+    CoinHoughCirclePresenter houghCirclePresenter;
 
     int reqCode = 0;
 
     String filePath;
+    String fileName;
+
+    Mat dst;
+    Mat img;
+    Bitmap bitmap;
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i("OpenCV", "OpenCV loaded successfully");
+                    dst = new Mat();
+                }
+                break;
+                default: {
+                    super.onManagerConnected(status);
+                }
+                break;
+            }
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!OpenCVLoader.initDebug()) {
+            Log.d("OpenCV", "Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_0_0, this, mLoaderCallback);
+        } else {
+            Log.d("OpenCV", "OpenCV library found inside package. Using it!");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,12 +110,43 @@ public class CoinProcessingResActivity extends AppCompatActivity {
 
     }
 
+
     private void initView() {
         originalIv = findViewById(R.id.coin_processing_show_iv);
         resultIv = findViewById(R.id.coin_processing_result_iv);
         setupBt = findViewById(R.id.coin_processing_bt);
 
+        setupBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dst = new Mat();
+
+                if (reqCode == RC_CHOOSE_PHOTO) {
+                    houghCirclePresenter.houghCirclesProcess(img, dst, fileName);
+
+                    Bitmap dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
+
+                    Utils.matToBitmap(dst, dstBm, true);
+
+                    resultIv.setImageBitmap(dstBm);
+                } else if (reqCode == RC_TAKE_PHOTO) {
+                    if (bitmap != null){
+                        dst = houghCirclePresenter.takePhotoHoughCircleProcess(img, dst, bitmap);
+
+                        Bitmap dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
+
+                        Utils.matToBitmap(dst, dstBm, true);
+                        resultIv.setImageBitmap(dstBm);
+                    }
+
+                }
+
+
+            }
+        });
+
         getPhotoPresenter = new GetPhotoPresenter(CoinProcessingResActivity.this);
+        houghCirclePresenter = new CoinHoughCirclePresenter(CoinProcessingResActivity.this);
 
         filePath = Environment.getExternalStorageDirectory().getPath();
         filePath = filePath + "/" + "temp.jpeg";
@@ -92,12 +175,14 @@ public class CoinProcessingResActivity extends AppCompatActivity {
 //        super.onActivityResult(requestCode, resultCode, data);
         requestCode = reqCode;
 
-        Log.d("aaaa", "requestCode: " + requestCode);
-
         switch (requestCode) {
             case RC_CHOOSE_PHOTO:
                 Uri uri = data.getData();
                 String filePath = FileUtil.getFilePathByUri(this, uri);
+                fileName = filePath;
+
+                Log.d("aaaa", "filename: " + fileName);
+                Log.d("aaaa", "filepath: " + filePath);
 
                 if (!TextUtils.isEmpty(filePath)) {
 
@@ -112,21 +197,42 @@ public class CoinProcessingResActivity extends AppCompatActivity {
 
                 try {
                     /*如果拍照成功，将Uri用BitmapFactory的decodeStream方法转为Bitmap*/
-                    Bitmap bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(getPhotoPresenter.getTakePhotoUri()));
+                    bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(getPhotoPresenter.getTakePhotoUri()));
+                    Log.d("aaaa", "imgUri: "+getPhotoPresenter.getTakePhotoUri());
                     //显示出来
                     originalIv.setImageBitmap(bitmap);
+
+
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
 
-
 //                RequestOptions requestOptions = new RequestOptions().skipMemoryCache(true);
-
 //                File file = new File(Environment.getExternalStorageDirectory() + File.separator + "photoTest" + File.separator);
-
-
 //                Glide.with(this).load(getPhotoPresenter.getPhotoPath()).apply(requestOptions).into(originalIv);
 
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.coin_menu_back, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.coin_menu_back:
+                Intent intent = new Intent(CoinProcessingResActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
 }
