@@ -31,29 +31,25 @@ public class CoinPicSelectedDialog extends Dialog {
     public CoinPicSelectedDialog(Context context) {
         super(context);
         this.context = context;
-    }
-
-    public CoinPicSelectedDialog(Context context, int themeResId) {
-        super(context, themeResId);
-        this.context = context;
         this.activity = (Activity) context;
     }
 
-    private View initView() {
-        View view = LayoutInflater.from(context).inflate(R.layout.coin_pic_dialog, null);
-        setContentView(view);
 
-        albumTv = view.findViewById(R.id.coin_dialog_album);
-        cameraTv = view.findViewById(R.id.coin_dialog_camera);
-
-        albumOnClickListener = new selectFromAlbumOnClickListener();
-        cameraOnClickListener = new selectFromCameraOnClickListener();
-
-        albumTv.setOnClickListener(albumOnClickListener);
-        cameraTv.setOnClickListener(cameraOnClickListener);
-
-        return view;
-    }
+//    private View initView() {
+//        View view = LayoutInflater.from(context).inflate(R.layout.coin_pic_dialog, null);
+//        setContentView(view);
+//
+//        albumTv = view.findViewById(R.id.coin_dialog_album);
+//        cameraTv = view.findViewById(R.id.coin_dialog_camera);
+//
+//        albumOnClickListener = new selectFromAlbumOnClickListener();
+//        cameraOnClickListener = new selectFromCameraOnClickListener();
+//
+//        albumTv.setOnClickListener(albumOnClickListener);
+//        cameraTv.setOnClickListener(cameraOnClickListener);
+//
+//        return view;
+//    }
 
     private class selectFromAlbumOnClickListener implements View.OnClickListener {
 
@@ -79,16 +75,22 @@ public class CoinPicSelectedDialog extends Dialog {
     }
 
     public void showDialog(){
+
+        View view = LayoutInflater.from(context).inflate(R.layout.coin_pic_dialog, null);
+        albumTv = view.findViewById(R.id.coin_dialog_album);
+        cameraTv = view.findViewById(R.id.coin_dialog_camera);
+
+        albumOnClickListener = new selectFromAlbumOnClickListener();
+        cameraOnClickListener = new selectFromCameraOnClickListener();
+
+        albumTv.setOnClickListener(albumOnClickListener);
+        cameraTv.setOnClickListener(cameraOnClickListener);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("选择照片来源")
-                .setView(initView())
+                .setView(view)
                 .setIcon(R.drawable.coin_lucky_coin)
-                .setNegativeButton("取消", new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                       dismiss();
-                    }
-                }).show();
+                .show();
 
     }
 

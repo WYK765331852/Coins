@@ -10,4 +10,8 @@ public interface GetPhotoInterface {
 
     public Uri getTakePhotoUri();
 
+    public String getPhotoPath();
+
+    public void setPhotoPath(String path);
+
 }
