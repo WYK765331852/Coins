@@ -21,9 +21,8 @@ import java.security.PublicKey;
 public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
 
     Activity activity;
-    Mat dst;
 
-    public CoinHoughCirclePresenter(Activity activity){
+    public CoinHoughCirclePresenter(Activity activity) {
         this.activity = activity;
     }
 
@@ -35,20 +34,25 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
         //目标
         Mat imgGray = new Mat();
         Mat circles = new Mat();
+        dst = img.clone();
+        Log.d("aaaa", "dst: " + dst);
+
         if (img.empty()) {
             Toast.makeText(activity, "no picture", Toast.LENGTH_SHORT).show();
         }
         //金字塔均值漂移滤波
-        Imgproc.pyrMeanShiftFiltering(img, img, 15, 80);
+        Imgproc.pyrMeanShiftFiltering(dst, img, 15, 80);
         //BGR2GRAY
         Imgproc.cvtColor(img, imgGray, Imgproc.COLOR_BGR2GRAY);
         //高斯滤波
         Imgproc.GaussianBlur(imgGray, imgGray, new Size(3, 3), 0);
 
-        dst.create(img.size(), img.type());
+//        dst.create(img.size(), img.type());
+
+
         //minDist太小，相邻圆检测成一个重合的圆,太大则漏检
         //param2 太小，可检测到更多不存在的圆，越大越接近完美的圆形
-        Imgproc.HoughCircles(imgGray, circles, Imgproc.HOUGH_GRADIENT, 1, 20, 100, 30, 10, 200);
+        Imgproc.HoughCircles(imgGray, circles, Imgproc.HOUGH_GRADIENT, 1, 200, 100, 30, 105, 143);
 
         Log.d("aaaa", "circles.cols: " + circles.cols());
         for (int i = 0; i < circles.cols(); i++) {
@@ -57,12 +61,18 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
             circles.get(0, i, info);
 
             Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 255, 0), 2, 8, 0);
+//            Imgproc.circle(img, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 255, 0), 2, 8, 0);
+            Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), 3, new Scalar(0, 255, 0), 2, 8, 0);
+
 
             Log.d("aaaa", "circles.radius: " + (int) info[2]);
 
         }
         circles.release();
         imgGray.release();
+
+        Log.d("aaaa", "dstEnd: " + dst);
+
 
         return dst;
     }
@@ -74,6 +84,8 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
         img = new Mat();
 //        img = new Mat(bitmap.getWidth(), bitmap.getHeight(), CvType.CV_8UC3, new Scalar(0));
         Utils.bitmapToMat(bitmap, img);
+        Imgproc.cvtColor(img, img, Imgproc.COLOR_BGR2RGB);
+
         img.create(bitmap.getHeight(), bitmap.getWidth(), CvType.CV_8UC3);
 
         Log.d("aaaa", "img: " + img);
@@ -81,11 +93,12 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
         //目标
         Mat imgGray = new Mat();
         Mat circles = new Mat();
+        dst = img.clone();
         if (img.empty()) {
             Toast.makeText(activity, "no picture", Toast.LENGTH_SHORT).show();
         }
         //金字塔均值漂移滤波
-        Imgproc.pyrMeanShiftFiltering(img, img, 15, 80);
+        Imgproc.pyrMeanShiftFiltering(dst, img, 15, 80);
         //BGR2GRAY
         Imgproc.cvtColor(img, imgGray, Imgproc.COLOR_BGR2GRAY);
         //高斯滤波
@@ -103,12 +116,15 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
             circles.get(0, i, info);
 
             Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 255, 0), 2, 8, 0);
+            Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), 2, new Scalar(0, 255, 0), 2, 8, 0);
+
 
             Log.d("aaaa", "circles.radius: " + (int) info[2]);
 
         }
         circles.release();
         imgGray.release();
+
 
         return dst;
 

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+            <!--JavaCameraView最终继承自SurfaceView，显示摄像头帧数据的展示-->
+            <org.opencv.android.JavaCameraView
+                android:id="@+id/coin_camera_view"
+                android:layout_width="match_parent"
+                android:layout_height="600dp"
+                android:layout_margin="6dp"
+                app:camera_id="back"
+                />
+
+            <Button
+                android:id="@+id/coin_camera_view_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:text="@string/coin_dialog_processing_bt"
+                android:background="@color/colorPrimary"
+                android:alpha="0.8"
+                />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+</LinearLayout>

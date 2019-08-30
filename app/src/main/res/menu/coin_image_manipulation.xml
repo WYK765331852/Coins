@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--mItemPreviewRGBA = menu.add("Preview RGBA");-->
+    <!--mItemPreviewHist = menu.add("Histograms");-->
+    <!--mItemPreviewCanny = menu.add("Canny");-->
+    <!--mItemPreviewSepia = menu.add("Sepia");-->
+    <!--mItemPreviewSobel = menu.add("Sobel");-->
+    <!--mItemPreviewZoom = menu.add("Zoom");-->
+    <!--mItemPreviewPixelize = menu.add("Pixelize");-->
+    <!--mItemPreviewPosterize = menu.add("Posterize");-->
+
+    <item
+        android:id="@+id/coin_menu_back"
+        android:title="@string/coin_menu_back"/>
+    <item
+        android:id="@+id/mItemPreviewRGBA"
+        android:title="@string/mItemPreviewRGBA"/>
+    <item
+        android:id="@+id/mItemPreviewHist"
+        android:title="@string/mItemPreviewHist"/>
+    <item
+        android:id="@+id/mItemPreviewCanny"
+        android:title="@string/mItemPreviewCanny"/>
+    <item
+        android:id="@+id/mItemPreviewSepia"
+        android:title="@string/mItemPreviewSepia"/>
+    <item
+        android:id="@+id/mItemPreviewSobel"
+        android:title="@string/mItemPreviewSobel"/>
+    <item
+        android:id="@+id/mItemPreviewZoom"
+        android:title="@string/mItemPreviewZoom"/>
+    <item
+        android:id="@+id/mItemPreviewPixelize"
+        android:title="@string/mItemPreviewPixelize"/>
+    <item
+        android:id="@+id/mItemPreviewPosterize"
+        android:title="@string/mItemPreviewPosterize"/>
+
+
+</menu>

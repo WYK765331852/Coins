@@ -31,6 +31,7 @@ import com.example.wyk.coins.presenter.GetPhotoPresenter;
 import com.example.wyk.coins.util.FileUtil;
 
 import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -64,13 +65,14 @@ public class CoinProcessingResActivity extends AppCompatActivity {
     Mat img;
     Bitmap bitmap;
 
+
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS: {
                     Log.i("OpenCV", "OpenCV loaded successfully");
-                    dst = new Mat();
+                    Mat dst1 = new Mat();
                 }
                 break;
                 default: {
@@ -90,7 +92,11 @@ public class CoinProcessingResActivity extends AppCompatActivity {
         } else {
             Log.d("OpenCV", "OpenCV library found inside package. Using it!");
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+            if (reqCode == RC_TAKE_PHOTO) {
+
+            }
         }
+
 
     }
 
@@ -110,6 +116,11 @@ public class CoinProcessingResActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
 
     private void initView() {
         originalIv = findViewById(R.id.coin_processing_show_iv);
@@ -119,29 +130,36 @@ public class CoinProcessingResActivity extends AppCompatActivity {
         setupBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dst = new Mat();
 
                 if (reqCode == RC_CHOOSE_PHOTO) {
-                    houghCirclePresenter.houghCirclesProcess(img, dst, fileName);
+                    Bitmap dstBm;
 
-                    Bitmap dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
 
-                    Utils.matToBitmap(dst, dstBm, true);
+                    if (dst!=null){
+                        Imgproc.cvtColor(dst, dst, Imgproc.COLOR_BGR2RGBA);
 
-                    resultIv.setImageBitmap(dstBm);
-                } else if (reqCode == RC_TAKE_PHOTO) {
-                    if (bitmap != null){
-                        dst = houghCirclePresenter.takePhotoHoughCircleProcess(img, dst, bitmap);
-
-                        Bitmap dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
+                        dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
 
                         Utils.matToBitmap(dst, dstBm, true);
                         resultIv.setImageBitmap(dstBm);
                     }
 
+                } else if (reqCode == RC_TAKE_PHOTO) {
+                    if (bitmap != null) {
+
+//                        dst = houghCirclePresenter.takePhotoHoughCircleProcess(img, dst, bitmap);
+
+                        if (dst !=null){
+
+                            Bitmap dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
+
+                            Utils.matToBitmap(dst, dstBm, true);
+                            resultIv.setImageBitmap(dstBm);
+                        }
+
+
+                    }
                 }
-
-
             }
         });
 
@@ -192,15 +210,37 @@ public class CoinProcessingResActivity extends AppCompatActivity {
                     Glide.with(this).load(filePath).apply(requestOptions).into(originalIv);
 
                 }
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            dst = houghCirclePresenter.houghCirclesProcess(img, dst, fileName);
+                            Thread.sleep(100);
+                            Log.d("aaaa", "dstCoin: " + dst);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+
                 break;
             case RC_TAKE_PHOTO:
 
                 try {
                     /*如果拍照成功，将Uri用BitmapFactory的decodeStream方法转为Bitmap*/
                     bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(getPhotoPresenter.getTakePhotoUri()));
-                    Log.d("aaaa", "imgUri: "+getPhotoPresenter.getTakePhotoUri());
+                    Log.d("aaaa", "imgUri: " + getPhotoPresenter.getTakePhotoUri());
                     //显示出来
                     originalIv.setImageBitmap(bitmap);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dst = houghCirclePresenter.takePhotoHoughCircleProcess(img, dst, bitmap);
+                        }
+                    }).start();
 
 
                 } catch (FileNotFoundException e) {
@@ -233,6 +273,5 @@ public class CoinProcessingResActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 }

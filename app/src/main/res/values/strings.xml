@@ -5,4 +5,24 @@
     <string name="coin_dialog_camera">从相机拍摄照片</string>
     <string name="coin_dialog_processing_bt">开始识别</string>
     <string name="coin_menu_back">Back</string>
+
+    <!--mItemPreviewRGBA = menu.add("Preview RGBA");-->
+    <!--mItemPreviewHist = menu.add("Histograms");-->
+    <!--mItemPreviewCanny = menu.add("Canny");-->
+    <!--mItemPreviewSepia = menu.add("Sepia");-->
+    <!--mItemPreviewSobel = menu.add("Sobel");-->
+    <!--mItemPreviewZoom = menu.add("Zoom");-->
+    <!--mItemPreviewPixelize = menu.add("Pixelize");-->
+    <!--mItemPreviewPosterize = menu.add("Posterize");-->
+
+    <string name="mItemPreviewRGBA">Preview RGBA</string>
+    <string name="mItemPreviewHist">Histograms</string>
+    <string name="mItemPreviewCanny">Canny</string>
+    <string name="mItemPreviewSepia">Sepia</string>
+    <string name="mItemPreviewSobel">Sobel</string>
+    <string name="mItemPreviewZoom">Zoom</string>
+    <string name="mItemPreviewPixelize">Pixelize</string>
+    <string name="mItemPreviewPosterize">Posterize</string>
+
+
 </resources>

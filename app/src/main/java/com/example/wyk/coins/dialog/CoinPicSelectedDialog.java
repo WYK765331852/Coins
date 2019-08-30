@@ -13,7 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wyk.coins.R;
+import com.example.wyk.coins.view.CoinCameraViewProcessActivity;
 import com.example.wyk.coins.view.CoinProcessingResActivity;
+import com.example.wyk.coins.view.OpencvCameraActivity;
 
 import static com.example.wyk.coins.presenter.GetPhotoPresenter.RC_CHOOSE_PHOTO;
 import static com.example.wyk.coins.presenter.GetPhotoPresenter.RC_TAKE_PHOTO;
@@ -67,7 +69,7 @@ public class CoinPicSelectedDialog extends Dialog {
         @Override
         public void onClick(View view) {
             Toast.makeText(context, "Select through camera", Toast.LENGTH_SHORT).show();
-            Intent getFromCameraIntent = new Intent(context, CoinProcessingResActivity.class);
+            Intent getFromCameraIntent = new Intent(context, OpencvCameraActivity.class);
             getFromCameraIntent.putExtra("getPic", RC_TAKE_PHOTO);
             context.startActivity(getFromCameraIntent);
             activity.finish();
