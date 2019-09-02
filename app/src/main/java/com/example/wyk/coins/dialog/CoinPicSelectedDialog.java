@@ -79,6 +79,7 @@ public class CoinPicSelectedDialog extends Dialog {
     public void showDialog(){
 
         View view = LayoutInflater.from(context).inflate(R.layout.coin_pic_dialog, null);
+
         albumTv = view.findViewById(R.id.coin_dialog_album);
         cameraTv = view.findViewById(R.id.coin_dialog_camera);
 
