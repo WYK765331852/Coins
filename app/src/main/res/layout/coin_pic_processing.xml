@@ -21,6 +21,14 @@
                 android:src="@drawable/coin_money_flow"
                 />
 
+            <!--<ImageView-->
+                <!--android:id="@+id/coin_processing_fake_coin"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_margin="6dp"-->
+                <!--android:src="@drawable/coin_money_flow"-->
+                <!--/>-->
+
             <Button
                 android:id="@+id/coin_processing_bt"
                 android:layout_width="wrap_content"
@@ -40,8 +48,8 @@
                 android:layout_margin="6dp"
                 android:src="@drawable/coin_money_flow"/>
 
-
         </LinearLayout>
+
     </ScrollView>
 
 

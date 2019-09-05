@@ -11,6 +11,8 @@ public interface CoinsHoughCirclesInterface {
 
     public Mat takePhotoHoughCircleProcess(Mat img, Mat dst, Bitmap bitmap);
 
+    public Mat getSrc();
+
 //    public Mat getTakePhotoHoughCircleMat();
 
 }

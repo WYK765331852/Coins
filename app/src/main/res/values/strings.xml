@@ -5,6 +5,7 @@
     <string name="coin_dialog_camera">从相机拍摄照片</string>
     <string name="coin_dialog_processing_bt">开始识别</string>
     <string name="coin_menu_back">Back</string>
+    <string name="coin_feature_detector">FeatureDetector</string>
 
     <!--mItemPreviewRGBA = menu.add("Preview RGBA");-->
     <!--mItemPreviewHist = menu.add("Histograms");-->

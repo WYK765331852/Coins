@@ -21,6 +21,7 @@ import java.security.PublicKey;
 public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
 
     Activity activity;
+    static Mat src1 = new Mat();
 
     public CoinHoughCirclePresenter(Activity activity) {
         this.activity = activity;
@@ -35,7 +36,9 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
         Mat imgGray = new Mat();
         Mat circles = new Mat();
         dst = img.clone();
+        src1 = img.clone();
         Log.d("aaaa", "dst: " + dst);
+        Log.d("aaaa", "src1: " + src1);
 
         if (img.empty()) {
             Toast.makeText(activity, "no picture", Toast.LENGTH_SHORT).show();
@@ -52,7 +55,7 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
 
         //minDist太小，相邻圆检测成一个重合的圆,太大则漏检
         //param2 太小，可检测到更多不存在的圆，越大越接近完美的圆形
-        Imgproc.HoughCircles(imgGray, circles, Imgproc.HOUGH_GRADIENT, 1, 200, 100, 30, 105, 143);
+        Imgproc.HoughCircles(imgGray, circles, Imgproc.HOUGH_GRADIENT, 1, 60, 100, 32, 70, 130);
 
         Log.d("aaaa", "circles.cols: " + circles.cols());
         for (int i = 0; i < circles.cols(); i++) {
@@ -60,9 +63,19 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
             float[] info = new float[3];
             circles.get(0, i, info);
 
-            Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 255, 0), 2, 8, 0);
+
+            if ((int) info[2] >= 109) {
+                Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 255, 0), 2, 8, 0);
+            } else if (((int) info[2] > 104) && ((int) info[2] < 109)) {
+                Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 0, 255), 2, 8, 0);
+            } else if (((int) info[2] > 89) && ((int) info[2] < 100)) {
+                Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(255, 0, 0), 2, 8, 0);
+            } else if ((int) info[2] < 89) {
+                Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(255, 255, 255), 2, 8, 0);
+            }
+//                Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 255, 0), 2, 8, 0);
 //            Imgproc.circle(img, new Point((int) info[0], (int) info[1]), (int) info[2], new Scalar(0, 255, 0), 2, 8, 0);
-            Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), 3, new Scalar(0, 255, 0), 2, 8, 0);
+            Imgproc.circle(dst, new Point((int) info[0], (int) info[1]), 4, new Scalar(0, 255, 0), 2, 8, 0);
 
 
             Log.d("aaaa", "circles.radius: " + (int) info[2]);
@@ -73,9 +86,9 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
 
         Log.d("aaaa", "dstEnd: " + dst);
 
-
         return dst;
     }
+
 
     @Override
     public Mat takePhotoHoughCircleProcess(Mat img, Mat dst, Bitmap bitmap) {
@@ -125,9 +138,16 @@ public class CoinHoughCirclePresenter implements CoinsHoughCirclesInterface {
         circles.release();
         imgGray.release();
 
-
         return dst;
+    }
 
+    @Override
+    public Mat getSrc() {
+        if (src1!=null){
+            return src1;
+        }
+        Log.d("aaaa", "getsrc1_src1: " + src1);
+        return null;
     }
 
 

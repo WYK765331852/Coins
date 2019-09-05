@@ -8,10 +8,13 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -31,12 +34,14 @@ import com.example.wyk.coins.presenter.GetPhotoPresenter;
 import com.example.wyk.coins.util.FileUtil;
 
 import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -44,6 +49,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import static com.example.wyk.coins.presenter.GetPhotoPresenter.RC_CHOOSE_PHOTO;
 import static com.example.wyk.coins.presenter.GetPhotoPresenter.RC_TAKE_PHOTO;
@@ -51,6 +57,7 @@ import static com.example.wyk.coins.presenter.GetPhotoPresenter.RC_TAKE_PHOTO;
 public class CoinProcessingResActivity extends AppCompatActivity {
     ImageView originalIv;
     ImageView resultIv;
+    //    ImageView fakeCoin;
     Button setupBt;
 
     GetPhotoPresenter getPhotoPresenter;
@@ -63,8 +70,16 @@ public class CoinProcessingResActivity extends AppCompatActivity {
 
     Mat dst;
     Mat img;
+    Mat src2FeatureDetector;
     Bitmap bitmap;
 
+    Handler handler;
+
+    private Mat hsv, hue, mask, prob;
+    private Rect trackRect;
+    private Mat hist;
+    private List<Mat> hsvList, hueList;
+    private MatOfFloat ranges;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -119,44 +134,37 @@ public class CoinProcessingResActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
     }
 
     private void initView() {
         originalIv = findViewById(R.id.coin_processing_show_iv);
         resultIv = findViewById(R.id.coin_processing_result_iv);
         setupBt = findViewById(R.id.coin_processing_bt);
+//        fakeCoin = findViewById(R.id.coin_processing_fake_coin);
+
+        handler = new HoughProcHandler();
+
 
         setupBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (reqCode == RC_CHOOSE_PHOTO) {
-                    Bitmap dstBm;
-
-
-                    if (dst!=null){
-                        Imgproc.cvtColor(dst, dst, Imgproc.COLOR_BGR2RGBA);
-
-                        dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
-
-                        Utils.matToBitmap(dst, dstBm, true);
-                        resultIv.setImageBitmap(dstBm);
-                    }
+                    HoughProcThread thread = new HoughProcThread();
+                    thread.start();
 
                 } else if (reqCode == RC_TAKE_PHOTO) {
                     if (bitmap != null) {
 
 //                        dst = houghCirclePresenter.takePhotoHoughCircleProcess(img, dst, bitmap);
 
-                        if (dst !=null){
+                        if (dst != null) {
 
                             Bitmap dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
 
                             Utils.matToBitmap(dst, dstBm, true);
                             resultIv.setImageBitmap(dstBm);
                         }
-
 
                     }
                 }
@@ -208,23 +216,7 @@ public class CoinProcessingResActivity extends AppCompatActivity {
 
                     //显示图片
                     Glide.with(this).load(filePath).apply(requestOptions).into(originalIv);
-
                 }
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            dst = houghCirclePresenter.houghCirclesProcess(img, dst, fileName);
-                            Thread.sleep(100);
-                            Log.d("aaaa", "dstCoin: " + dst);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }).start();
-
-
                 break;
             case RC_TAKE_PHOTO:
 
@@ -268,10 +260,57 @@ public class CoinProcessingResActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
                 break;
+            case R.id.coin_feature_detector:
+                Intent intent1 = new Intent(CoinProcessingResActivity.this, CoinsFeatureDetectorActivity.class);
+                startActivity(intent1);
+                finish();
+                break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private class HoughProcThread extends Thread {
+        @Override
+        public void run() {
+            dst = houghCirclePresenter.houghCirclesProcess(img, dst, fileName);
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.d("aaaa", "dstCoin: " + dst);
+            Message message = handler.obtainMessage();
+            message.obj = dst;
+            handler.sendMessage(message);
+
+        }
+    }
+
+    private class HoughProcHandler extends Handler {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            Bitmap dstBm;
+            Mat dst = (Mat) msg.obj;
+
+            if (dst != null) {
+                Imgproc.cvtColor(dst, dst, Imgproc.COLOR_BGR2RGBA);
+
+                dstBm = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
+
+                Utils.matToBitmap(dst, dstBm, true);
+                resultIv.setImageBitmap(dstBm);
+            }
+        }
+    }
+
+    public Mat getSrc2FeatureDetector(){
+        if (src2FeatureDetector!=null){
+
+        }
+        return null;
+    }
+
 
 }

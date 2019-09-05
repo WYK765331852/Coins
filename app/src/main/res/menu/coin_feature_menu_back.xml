@@ -2,13 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/coin_menu_back"
+        android:id="@+id/coin_feature_menu_back"
+        app:showAsAction="ifRoom"
         android:title="@string/coin_menu_back">
-    </item>
-    <item
-        android:id="@+id/coin_feature_detector"
-        android:title="@string/coin_feature_detector">
-    </item>
 
+    </item>
 
 </menu>

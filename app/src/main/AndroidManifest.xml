@@ -26,6 +26,7 @@
         <activity android:name=".view.CoinProcessingResActivity" />
         <activity android:name=".view.CoinCameraViewProcessActivity"/>
         <activity android:name=".view.OpencvCameraActivity"/>
+        <activity android:name=".view.CoinsFeatureDetectorActivity"/>
 
 
         <provider
